@@ -33,27 +33,19 @@ func splicePattern(p string) []byte {
 	return b[:i+1]
 }
 
-func checkAndReturn(s []byte, p []byte, cache *map[Pair]bool) bool {
-	pair := Pair{s: len(s), p: len(p)}
-	val, ok := (*cache)[pair]
-	if ok {
-		return val
-	}
-	res := isMatchHelper(s, p, cache)
-	(*cache)[pair] = res
-	return res
-}
+func checkPair(s []byte, p []byte, pair Pair) bool {
 
-func isMatchHelper(s []byte, p []byte, cache *map[Pair]bool) bool {
+	ss := pair.s
+	ps := pair.p
 
-	if len(s) == 0 && len(p) == 0 {
+	if ss == len(s) && ps == len(p) {
 		return true
 	}
-	if len(p) == 0 && len(s) != 0 {
+	if ps == len(p) && ss < len(s) {
 		return false
 	}
-	if len(s) == 0 {
-		for _, ss := range p {
+	if ss == len(s) {
+		for _, ss := range p[ps:] {
 			if ss == star {
 				continue
 			} else {
@@ -62,18 +54,58 @@ func isMatchHelper(s []byte, p []byte, cache *map[Pair]bool) bool {
 		}
 		return true
 	}
+	return false
+}
 
-	ps := p[0]
-	ss := s[0]
+func isMatchHelper(s []byte, p []byte) bool {
 
-	if ps != star {
-		if ps == question || ps == ss {
-			return checkAndReturn(s[1:], p[1:], cache)
+	pos := Pair{0, 0}
+	res := checkPair(s, p, pos)
+	if res {
+		return res
+	}
+
+	sL := len(s)
+	pL := len(p)
+
+	stack := []Pair{pos}
+
+	cache := map[Pair]bool{}
+
+	for len(stack) > 0 {
+		lastIdx := len(stack) - 1
+		pos := stack[lastIdx]
+		stack = stack[:lastIdx]
+		_, ok := cache[pos]
+
+		if ok {
+			continue
 		}
-		(*cache)[Pair{s: len(s[1:]), p: len(p[1:])}] = false
-		return false
-	} else if ps == star {
-		return checkAndReturn(s, p[1:], cache) || checkAndReturn(s[1:], p[1:], cache) || checkAndReturn(s[1:], p, cache)
+
+		res := checkPair(s, p, pos)
+		if res {
+			return res
+		}
+
+		if pos.p >= pL || pos.s >= sL {
+			continue
+		}
+
+		cache[pos] = true
+
+		ss := s[pos.s]
+		ps := p[pos.p]
+
+		if ps != star {
+			if ps == question || ps == ss {
+				stack = append(stack, Pair{s: pos.s + 1, p: pos.p + 1})
+			}
+		} else if ps == star {
+			stack = append(stack, Pair{s: pos.s, p: pos.p + 1})
+			stack = append(stack, Pair{s: pos.s + 1, p: pos.p})
+			stack = append(stack, Pair{s: pos.s + 1, p: pos.p + 1})
+		}
+
 	}
 
 	return false
@@ -82,6 +114,5 @@ func isMatchHelper(s []byte, p []byte, cache *map[Pair]bool) bool {
 func isMatch(s string, p string) bool {
 	ss := []byte(s)
 	ps := splicePattern(p)
-	cache := map[Pair]bool{}
-	return isMatchHelper(ss, ps, &cache)
+	return isMatchHelper(ss, ps)
 }
