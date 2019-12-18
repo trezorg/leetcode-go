@@ -21,7 +21,6 @@ var (
 			res[byte(s)] = true
 		}
 		return res
-
 	}()
 	dotToken             = SingleSymbolToken{symbol: dot}
 	starToken            = SingleSymbolToken{symbol: star}
