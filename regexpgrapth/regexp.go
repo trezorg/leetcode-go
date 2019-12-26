@@ -5,20 +5,23 @@ import (
 )
 
 const (
-	dot            = rune('.')
-	star           = rune('*')
-	plus           = rune('+')
-	parenthesLeft  = rune('(')
-	parenthesRight = rune(')')
+	dotSymbol            = rune('.')
+	starSymbol           = rune('*')
+	plusSymbol           = rune('+')
+	parenthesLeftSymbol  = rune('(')
+	parenthesRightSymbol = rune(')')
+	orSymbol             = rune('|')
 )
 
 var (
-	excludeSymbols = func() map[byte]struct{} {
-		res := map[byte]struct{}{}
-		res[star] = struct{}{}
-		res[plus] = struct{}{}
-		res[parenthesLeft] = struct{}{}
-		res[parenthesRight] = struct{}{}
+	excludeSymbols = func() map[rune]struct{} {
+		res := map[rune]struct{}{
+			starSymbol:           struct{}{},
+			plusSymbol:           struct{}{},
+			parenthesLeftSymbol:  struct{}{},
+			parenthesRightSymbol: struct{}{},
+			orSymbol:             struct{}{},
+		}
 		return res
 	}()
 )
@@ -31,10 +34,16 @@ type Token interface {
 	value() string
 }
 
+// RegexGraph struct
+type RegexGraph struct {
+	edge     Token
+	vertices []Token
+}
+
 // AnySymbolToken for one of possible tokens
 type AnySymbolToken struct {
 	excludeSymbols map[byte]bool
-	val            string
+	symbol         rune
 }
 
 func (t AnySymbolToken) read(data string, pos int) int {
@@ -55,23 +64,23 @@ func (t AnySymbolToken) add(token ...Token) Token {
 
 func (t AnySymbolToken) or(token ...Token) Token {
 	tokens := []Token{t}
-	return ConcatToken{tokens: append(tokens, token...)}
+	return SplitToken{tokens: append(tokens, token...)}
 }
 
 func (t AnySymbolToken) value() string {
-	return t.val
+	return string(t.symbol)
 }
 
 // SymbolToken one token
 type SymbolToken struct {
-	symbol byte
+	symbol rune
 }
 
 func (t SymbolToken) read(data string, pos int) int {
 	if pos >= len(data) {
 		return 0
 	}
-	if t.symbol == data[pos] {
+	if t.symbol == rune(data[pos]) {
 		return 1
 	}
 	return 0
@@ -102,11 +111,13 @@ func (t ConcatToken) value() string {
 }
 
 func (t ConcatToken) add(token ...Token) Token {
-	return t
+	tokens := []Token{t}
+	return ConcatToken{tokens: append(tokens, token...)}
 }
 
 func (t ConcatToken) or(token ...Token) Token {
-	return t
+	tokens := []Token{t}
+	return SplitToken{tokens: append(tokens, token...)}
 }
 
 // SplitToken struct
@@ -132,14 +143,16 @@ func (t SplitToken) value() string {
 }
 
 func (t SplitToken) add(token ...Token) Token {
-	return t
+	tokens := []Token{t}
+	return ConcatToken{tokens: append(tokens, token...)}
 }
 
 func (t SplitToken) or(token ...Token) Token {
-	return t
+	tokens := []Token{t}
+	return SplitToken{tokens: append(tokens, token...)}
 }
 
-func parseTokens(data string) ([][]byte, error) {
+func parseTokens(data string) (RegexGraph, error) {
 	s := []byte(data)
 	var res [][]byte
 	for len(s) > 0 {
