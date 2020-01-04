@@ -352,7 +352,6 @@ func letItemLexer(l *lexer, state *state) (item, error) {
 				l.acceptRun(alphaDigits)
 				variableResut := &variableItem{name: l.get(), state: state}
 				result.add(variableResut)
-				l.swallow(spaceSymbol)
 				elmCount++
 			} else if l.acceptRune(groupStart) {
 				l.backup()
@@ -380,10 +379,18 @@ func letItemLexer(l *lexer, state *state) (item, error) {
 	return result, nil
 }
 
-func evaluate(expression string) int {
+func parseExpression(expression string) (item, error) {
 	lexer := newLexer(expression)
 	state := newState(nil)
 	item, err := groupLexer(lexer, state)
+	if err != nil {
+		return nil, err
+	}
+	return item, nil
+}
+
+func evaluate(expression string) int {
+	item, err := parseExpression(expression)
 	if err != nil {
 		panic(err)
 	}

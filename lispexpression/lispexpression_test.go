@@ -112,6 +112,25 @@ func TestExpression22(t *testing.T) {
 	assert.Equal(t, 3, evaluate(s))
 }
 
+func TestExpression23(t *testing.T) {
+	s := "(let x -2 z (add x 1) y 4)"
+	_, err := parseExpression(s)
+	assert.Error(t, err)
+}
+
+func TestExpression24(t *testing.T) {
+	s := "(let x -2 z (add x 1) y 4 k)"
+	_, err := parseExpression(s)
+	assert.NoError(t, err)
+}
+
+func TestExpression25(t *testing.T) {
+	s := "(let x -2 z (add t 1) t 4 z)"
+	item, err := parseExpression(s)
+	assert.NoError(t, err)
+	assert.Equal(t, 5, item.evaluate())
+}
+
 func TestLexer1(t *testing.T) {
 	s := "xxxxxyyyyyysssss"
 	lexer := newLexer(s)
