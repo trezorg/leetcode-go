@@ -1,4 +1,5 @@
 push
 .idea
+.vscode
 .cache
 proxy_bucket

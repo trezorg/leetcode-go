@@ -25,3 +25,10 @@ func TestRange4(t *testing.T) {
 	r := [][]int{{-5, -4, -3, -2, -1}, {-10, -9, 12, 4, 5}}
 	assert.Equal(t, []int{-9, -5}, smallestRange(r))
 }
+
+func BenchmarkRange(b *testing.B) {
+	r := [][]int{{4, 10, 15, 24, 26}, {0, 9, 12, 20}, {5, 18, 22, 30}}
+	for i := 0; i <= b.N; i++ {
+		assert.Equal(b, []int{20, 24}, smallestRange(r))
+	}
+}
