@@ -1,9 +1,9 @@
 package rotatelist
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
-	"fmt"
 )
 
 func IntToString(values []int, sep string) string {
@@ -73,9 +73,8 @@ func (head *ListNode) rotate() *ListNode {
 	cur := head
 	next := cur.Next
 	for next != nil {
-		temp := next.Next 
-		next.Next = cur
-		cur = next
+		temp := next.Next
+		next.Next, cur = cur, next
 		next = temp
 	}
 	head.Next = nil
