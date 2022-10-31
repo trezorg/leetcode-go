@@ -1,6 +1,6 @@
 package intervallistintersections
 
-func intervalIntersection(A [][]int, B [][]int) [][]int {
+func intervalIntersectionOld(A [][]int, B [][]int) [][]int {
 	result := make([][]int, 0)
 	if len(A) == 0 || len(B) == 0 {
 		return result
@@ -75,5 +75,37 @@ func intervalIntersection(A [][]int, B [][]int) [][]int {
 		endValue = nextEndValue()
 	}
 
+	return result
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func intervalIntersection(A [][]int, B [][]int) [][]int {
+	result := make([][]int, 0)
+
+	for i, j := 0, 0; i < len(A) && j < len(B); {
+		aStart, aEnd := A[i][0], A[i][1]
+		bStart, bEnd := B[j][0], B[j][1]
+		if aStart <= bEnd && bStart <= aEnd {
+			result = append(result, []int{max(aStart, bStart), min(aEnd, bEnd)})
+		}
+		if aEnd < bEnd {
+			i++
+		} else {
+			j++
+		}
+	}
 	return result
 }
