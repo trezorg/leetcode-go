@@ -1,4 +1,4 @@
-package removenodefromendoflist
+package main
 
 import (
 	"fmt"
