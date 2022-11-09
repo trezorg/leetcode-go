@@ -61,7 +61,7 @@ func sortSlice(a [][]int) {
 
 func TestPermute(t *testing.T) {
 
-	funcs := []func([]int) [][]int{permute, permuteIterable}
+	funcs := []func([]int) [][]int{permute, permuteIterable, permuteNext}
 
 	for _, f := range funcs {
 		for _, v := range data {
@@ -80,7 +80,7 @@ func TestPermute(t *testing.T) {
 
 func BenchmarkPermute(b *testing.B) {
 
-	funcs := []func([]int) [][]int{permute, permuteIterable}
+	funcs := []func([]int) [][]int{permute, permuteIterable, permuteNext}
 
 	var data = []struct {
 		data []int
