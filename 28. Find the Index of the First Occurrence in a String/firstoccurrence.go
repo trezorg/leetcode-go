@@ -1,5 +1,7 @@
 package main
 
+import "bytes"
+
 func comp(a, b []byte) int {
 	var j int
 	for i := len(a) - 1; i >= 0; i-- {
@@ -41,6 +43,32 @@ func strStr(haystack string, needle string) int {
 			return i
 		}
 		i += idx
+	}
+
+	return -1
+
+}
+
+func strStrRabinKarp(haystack string, needle string) int {
+	sn, n := len(haystack), len(needle)
+	if sn < n {
+		return -1
+	}
+
+	haystackBytes, needleBytes := []byte(haystack), []byte(needle)
+	needleHash, haystackHash := 0, 0
+	for i := 0; i < n; i++ {
+		needleHash += int(needleBytes[i])
+		haystackHash += int(haystackBytes[i])
+	}
+	if needleHash == haystackHash && bytes.Compare(haystackBytes[:n], needleBytes[:n]) == 0 {
+		return 0
+	}
+	for i := 1; i < sn-n+1; i++ {
+		haystackHash += int(haystackBytes[i+n-1]) - int(haystackBytes[i-1])
+		if needleHash == haystackHash && bytes.Compare(haystackBytes[i:i+n], needleBytes) == 0 {
+			return i
+		}
 	}
 
 	return -1
