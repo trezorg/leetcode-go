@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"reflect"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -42,22 +45,30 @@ var data = []struct {
 }
 
 func TestValidSudoku(t *testing.T) {
-	for _, v := range data {
-		t.Run(fmt.Sprintf("%v-%v", len(v.data), v.result), func(t *testing.T) {
-			require.Equal(t, v.result, isValidSudoku(v.data))
-		})
+	funcs := []func([][]byte) bool{isValidSudoku, isValidSudokuImproved}
+	for _, f := range funcs {
+		name := strings.Split((runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()), ".")[1]
+		for _, v := range data {
+			t.Run(fmt.Sprintf("%s-%v-%v", name, len(v.data), v.result), func(t *testing.T) {
+				require.Equal(t, v.result, f(v.data))
+			})
+		}
 	}
 
 }
 
 func BenchmarkValidSudoku(b *testing.B) {
-	for _, v := range data {
-		b.Run(fmt.Sprintf("%v-%v", len(v.data), v.result), func(b *testing.B) {
-			b.ReportAllocs()
-			for i := 0; i < b.N; i++ {
-				isValidSudoku(v.data)
-			}
-		})
+	funcs := []func([][]byte) bool{isValidSudoku, isValidSudokuImproved}
+	for _, f := range funcs {
+		name := strings.Split((runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()), ".")[1]
+		for _, v := range data {
+			b.Run(fmt.Sprintf("%s-%v-%v", name, len(v.data), v.result), func(b *testing.B) {
+				b.ReportAllocs()
+				for i := 0; i < b.N; i++ {
+					f(v.data)
+				}
+			})
+		}
 	}
 
 }
