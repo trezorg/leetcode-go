@@ -30,6 +30,12 @@ func TestMergeIntervals4(t *testing.T) {
 	assert.Equal(t, output, merge(input))
 }
 
+func TestMergeIntervals5(t *testing.T) {
+	input := [][]int{{1, 4}, {6, 5}}
+	output := [][]int{{1, 4}, {6, 5}}
+	assert.Equal(t, output, merge(input))
+}
+
 func TestMergeIntervals6(t *testing.T) {
 	input := [][]int{}
 	output := [][]int{}

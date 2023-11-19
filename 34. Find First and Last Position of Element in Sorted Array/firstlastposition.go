@@ -47,3 +47,39 @@ func searchRange(nums []int, target int) []int {
 	return res
 
 }
+
+func searchRange2(nums []int, target int) []int {
+
+	res := []int{-1, -1}
+	var search func(i, j int)
+
+	search = func(i, j int) {
+		if i > j {
+			return
+		}
+		middle := (i + j) / 2
+		if nums[middle] == target {
+			res[0] = middle
+			res[1] = middle
+			for t := middle - 1; t >= 0; t -= 1 {
+				if nums[t] == target {
+					res[0] = t
+				}
+			}
+			for t := middle + 1; t < len(nums); t += 1 {
+				if nums[t] == target {
+					res[1] = t
+				}
+			}
+			return
+		} else if nums[middle] > target {
+			search(i, middle-1)
+		} else {
+			search(middle+1, j)
+		}
+	}
+
+	search(0, len(nums)-1)
+	return res
+
+}

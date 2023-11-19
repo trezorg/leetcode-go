@@ -21,10 +21,17 @@ var data = []struct {
 	{nums: []int{8, 8, 8, 8, 8, 8}, target: 8, result: []int{0, 5}},
 }
 
-func TestStrStr(t *testing.T) {
+func TestSearchRange(t *testing.T) {
 	for _, v := range data {
 		t.Run(fmt.Sprintf("%v-%d", v.nums, v.target), func(t *testing.T) {
 			require.Equal(t, v.result, searchRange(v.nums, v.target))
+		})
+	}
+}
+func TestSearchRange2(t *testing.T) {
+	for _, v := range data {
+		t.Run(fmt.Sprintf("%v-%d", v.nums, v.target), func(t *testing.T) {
+			require.Equal(t, v.result, searchRange2(v.nums, v.target))
 		})
 	}
 
