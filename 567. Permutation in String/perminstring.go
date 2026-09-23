@@ -19,9 +19,9 @@ func checkInclusion(s1 string, s2 string) bool {
 		return true
 	}
 
-	for i := 1; i < sn-n+1; i++ {
-		stringCounts[s2[i-1]-'a']--
-		stringCounts[s2[i+n-1]-'a']++
+	for i := 0; i < sn-n; i++ {
+		stringCounts[s2[i]-'a']--
+		stringCounts[s2[i+n]-'a']++
 		if subStringCounts == stringCounts {
 			return true
 		}
